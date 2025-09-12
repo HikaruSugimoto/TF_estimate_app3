@@ -12,16 +12,22 @@ import os
 import zipfile
 import gc
 import base64
+from PIL import Image
 
 #Main
 st.set_page_config(layout="wide")
-st.title("TF activity inference")
+st.title("TFActProfiler")
 #st.write("This website is free and open to all users and there is no login requirement.")
 
 #1, upload omics data
 #Slidebar
-st.sidebar.subheader('1, Upload omics data')
+st.sidebar.subheader('Upload omics data')
 TF_act_database= pd.read_csv("TF_act_data.csv")
+
+st.write('This tool uses TFActProfiler with the Univariate Linear Model (ULM) to estimate per-sample/cell transcription factor activity from RNA-seq data.')
+st.write('This app accepts transcriptome data in the following format:')
+image = Image.open('input data.png')
+st.image(image, caption='',use_container_width=True)
 
 if(os.path.isfile('demo.zip')):
     os.remove('demo.zip')
@@ -37,8 +43,52 @@ with open("demo.zip", "rb") as file:
     st.sidebar.markdown(href, unsafe_allow_html=True)
 if(os.path.isfile('demo.zip')):
     os.remove('demo.zip')
+
+with st.expander("📘 User guide", expanded=False):
+    st.markdown("""
+
+---
+### 1) Input requirements
+
+**Expression (CSV)**  
+- **Rows = samples, Columns = genes**.  
+- Numeric values only. 
+- **Gene identifiers must match the network targets** (Gene symbols in human GRCh38).
+---
+### 2) Output
+
+- `TF_activity.csv` — TF × sample activity matrix (t-statistics). Positive means activation; negative means repression in that sample.
+- `TF_adj_pvalue.csv` — TF × sample adj p-values.  
+---
+### 3) Citation
+
+- 
+
+""")
+
+with st.expander("🧪 Notes"):
+    st.markdown("""
+**Scope**  
+The app implements TF activity inference per sample/cell using a prior of signed TF–mRNA links.
+
+**About the TF–mRNA prior**  
+- TFActProfiler constructs a high-coverage, signed TF–mRNA database by integrating broad priors (e.g., ChIP-derived peaks, motif-based networks, curated sets) with large-scale RNA-seq atlases via regression.  
+- The resulting table provides both directionality (activation/repression) and relative effect sizes, aiming to balance breadth (many TFs/targets) and precision (functional direction).
+
+**Why is ULM used**  
+- In knockdown benchmarks across human cell lines, TFActProfiler paired with ULM outperformed activity inference based on unfiltered broad priors or narrowly curated sets—while maintaining wide coverage.  
+
+**Limitations**  
+- This is **not** gene regulatory network (GRN) inference; use dedicated GRN tools if networks are required.
+""")
+
+with st.expander("❓ FAQ / Troubleshooting"):
+    st.markdown("""
+- **I get “No overlap between expression genes and network targets.”**  
+  Check your gene identifiers (e.g., HGNC vs Ensembl). Ensure organism and version match.  
+""")
     
-Tran = st.sidebar.file_uploader("Transcriptome data", type="csv")
+Tran = st.sidebar.file_uploader("", type="csv")
 if Tran is not None:
     st.subheader('Uploaded transcriptome data')
     Tran = pd.read_csv(Tran)
