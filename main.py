@@ -44,6 +44,9 @@ with open("demo.zip", "rb") as file:
 if(os.path.isfile('demo.zip')):
     os.remove('demo.zip')
 
+st.subheader('License')
+st.write("This web application is licensed free of charge for academic use and we shall not be liable for any direct, indirect, incidental, or consequential damages resulting from the use of this web app. In addition, we are under no obligation to provide maintenance, support, updates, enhancements, or modifications.")
+
 with st.expander("📘 User guide", expanded=False):
     st.markdown("""
 
@@ -60,9 +63,9 @@ with st.expander("📘 User guide", expanded=False):
 - `TF_activity.csv` — TF × sample activity matrix (t-statistics). Positive means activation; negative means repression in that sample.
 - `TF_adj_pvalue.csv` — TF × sample adj p-values.  
 ---
-### 3) Citation
+### 3) Citation & Code
 
-- 
+- https://github.com/HikaruSugimoto/tfactprofiler/tree/main
 
 """)
 
